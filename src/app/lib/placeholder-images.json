@@ -1,15 +1,16 @@
+
 {
   "placeholderImages": [
     {
       "id": "hero-official",
       "description": "Atmospheric cinematic shot of a post-apocalyptic survivalist base at dusk",
-      "imageUrl": "https://picsum.photos/seed/rust-hero-v2/1920/1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media&token=7da7b671-e55c-43e0-8616-daff25625f4a",
       "imageHint": "rust survival wasteland"
     },
     {
       "id": "hero-fallback",
       "description": "Epic cinematic shot of a rust base in a post-apocalyptic sunset",
-      "imageUrl": "https://picsum.photos/seed/rust1/1920/1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media&token=7da7b671-e55c-43e0-8616-daff25625f4a",
       "imageHint": "post-apocalyptic survival"
     },
     {

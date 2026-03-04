@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,7 +23,7 @@ export function Hero() {
   const logoPlaceholder = getPlaceholderById("brand-logo");
   
   // Initialize state with placeholder images as default
-  const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media");
+  const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media&token=7da7b671-e55c-43e0-8616-daff25625f4a");
   const [brandLogo, setBrandLogo] = useState(logoPlaceholder.imageUrl || "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080");
   const [isGenerating, setIsGenerating] = useState(false);
 
