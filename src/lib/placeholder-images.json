@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero-official",
-      "description": "Cinematic shot of a rust survivor looking at a nuclear plant dome during a post-apocalyptic sunset",
-      "imageUrl": "https://picsum.photos/seed/rustofficial/1920/1080",
-      "imageHint": "post-apocalyptic dome"
+      "description": "Atmospheric cinematic shot of a post-apocalyptic survivalist base at dusk",
+      "imageUrl": "https://picsum.photos/seed/rust-hero-v2/1920/1080",
+      "imageHint": "rust survival wasteland"
     },
     {
       "id": "hero-fallback",

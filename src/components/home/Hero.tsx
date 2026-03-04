@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,7 +21,7 @@ export function Hero() {
   const heroFallbackItem = PlaceHolderImages.find(img => img.id === "hero-official");
   const logoFallbackItem = PlaceHolderImages.find(img => img.id === "brand-logo");
   
-  const [heroBg, setHeroBg] = useState(heroFallbackItem?.imageUrl || "https://picsum.photos/seed/rustofficial/1920/1080");
+  const [heroBg, setHeroBg] = useState(heroFallbackItem?.imageUrl || "https://picsum.photos/seed/rust-hero-v2/1920/1080");
   const [brandLogo, setBrandLogo] = useState(logoFallbackItem?.imageUrl || "https://picsum.photos/seed/rustlogo/200/200");
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -69,7 +68,7 @@ export function Hero() {
           fill 
           className="object-cover transition-opacity duration-1000"
           priority
-          data-ai-hint="post-apocalyptic dome"
+          data-ai-hint="rust survival wasteland"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-transparent" />
