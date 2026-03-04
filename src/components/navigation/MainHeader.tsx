@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Shield, LayoutGrid, MessageSquare, Newspaper, User, Menu, LogOut } from "lucide-react";
+import { LayoutGrid, MessageSquare, Newspaper, User, Menu, LogOut } from "lucide-react";
 import { 
   Sheet, 
   SheetContent, 
@@ -14,11 +14,14 @@ import {
 import { useState } from "react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
+import Image from "next/image";
+import { getPlaceholderById } from "@/lib/placeholder-images";
 
 export function MainHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
   const auth = useAuth();
+  const logoPlaceholder = getPlaceholderById("brand-logo");
 
   const handleLogout = () => {
     signOut(auth);
@@ -34,9 +37,14 @@ export function MainHeader() {
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 py-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-1.5 rounded-sm transform transition-transform group-hover:rotate-12">
-            <Shield className="w-6 h-6 text-white" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-8 h-8 rounded-sm overflow-hidden transform transition-transform group-hover:scale-110">
+            <Image 
+              src={logoPlaceholder.imageUrl}
+              alt="Rust365 Icon"
+              fill
+              className="object-contain"
+            />
           </div>
           <span className="font-headline font-bold text-2xl tracking-tighter text-white">RUST365</span>
         </Link>

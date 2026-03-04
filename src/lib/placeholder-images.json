@@ -44,9 +44,9 @@
     },
     {
       "id": "brand-logo",
-      "description": "Minimalist survivalist icon",
-      "imageUrl": "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "minimalist logo"
+      "description": "Official Rust365 Brand Icon",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_icon_1024.png?alt=media&token=7ff543c4-61ea-48c5-9ffa-e8124a2042f2",
+      "imageHint": "rust logo"
     }
   ]
 }

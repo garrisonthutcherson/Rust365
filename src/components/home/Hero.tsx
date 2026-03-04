@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,9 +21,9 @@ export function Hero() {
   const heroPlaceholder = getPlaceholderById("hero-official");
   const logoPlaceholder = getPlaceholderById("brand-logo");
   
-  // Initialize state with placeholder images as default
+  // Initialize state with specific brand assets
   const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media&token=7da7b671-e55c-43e0-8616-daff25625f4a");
-  const [brandLogo, setBrandLogo] = useState(logoPlaceholder.imageUrl || "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080");
+  const [brandLogo, setBrandLogo] = useState(logoPlaceholder.imageUrl);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Sync state with Firestore data if it exists
@@ -89,8 +88,8 @@ export function Hero() {
                  src={brandLogo} 
                  alt="Logo" 
                  fill 
-                 className="object-cover" 
-                 data-ai-hint="minimalist logo"
+                 className="object-contain p-2" 
+                 data-ai-hint="rust logo"
                />
              )}
           </div>
@@ -104,7 +103,7 @@ export function Hero() {
           The most advanced Rust server directory, community hub, and tactical directory. Find your next wipe, join the conversation, and dominate the island.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex flex-col sm:sm:flex-row gap-4 justify-center items-center">
           <Button size="lg" className="rust-gradient font-headline text-lg px-10 h-14 group">
             FIND A SERVER
             <Play className="ml-2 w-4 h-4 fill-white group-hover:translate-x-1 transition-transform" />
