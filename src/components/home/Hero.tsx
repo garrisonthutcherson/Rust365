@@ -19,10 +19,10 @@ export function Hero() {
   const configRef = useMemoFirebase(() => doc(db, "appConfiguration", "global"), [db]);
   const { data: config, isLoading: isConfigLoading } = useDoc(configRef);
 
-  const fallbackHero = PlaceHolderImages.find(img => img.id === "hero-official")?.imageUrl || "https://picsum.photos/seed/rustofficial/1920/1080";
+  const heroFallbackItem = PlaceHolderImages.find(img => img.id === "hero-official");
   const logoFallbackItem = PlaceHolderImages.find(img => img.id === "brand-logo");
   
-  const [heroBg, setHeroBg] = useState(fallbackHero);
+  const [heroBg, setHeroBg] = useState(heroFallbackItem?.imageUrl || "https://picsum.photos/seed/rustofficial/1920/1080");
   const [brandLogo, setBrandLogo] = useState(logoFallbackItem?.imageUrl || "https://picsum.photos/seed/rustlogo/200/200");
   const [isGenerating, setIsGenerating] = useState(false);
 
