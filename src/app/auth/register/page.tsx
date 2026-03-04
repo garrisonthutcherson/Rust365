@@ -105,7 +105,7 @@ export default function RegisterPage() {
             <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter italic">Join the <span className="text-primary">Raid</span></CardTitle>
             <CardDescription>Create your Rust365 account to join the community.</CardDescription>
           </div>
-        </Header>
+        </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
