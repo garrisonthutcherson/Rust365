@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LayoutGrid, MessageSquare, Newspaper, User, Menu, LogOut } from "lucide-react";
+import { LayoutGrid, MessageSquare, Newspaper, User, Menu, LogOut, ShieldCheck } from "lucide-react";
 import { 
   Sheet, 
   SheetContent, 
@@ -61,6 +61,17 @@ export function MainHeader() {
               {link.label}
             </Link>
           ))}
+          
+          {user && (
+            <Link 
+              href="/admin/seed" 
+              className="flex items-center gap-2 text-sm font-bold text-yellow-500 hover:text-yellow-400 transition-colors"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              ADMIN
+            </Link>
+          )}
+
           <div className="h-4 w-px bg-border mx-2" />
           
           {user ? (
@@ -109,6 +120,17 @@ export function MainHeader() {
                     {link.label}
                   </Link>
                 ))}
+
+                {user && (
+                  <Link 
+                    href="/admin/seed" 
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 text-xl font-headline font-bold text-yellow-500"
+                  >
+                    <ShieldCheck className="w-6 h-6" />
+                    ADMIN TOOLS
+                  </Link>
+                )}
                 
                 <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-8">
                   {user ? (
