@@ -1,10 +1,9 @@
 import { Hero } from "@/components/home/Hero";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Newspaper, Users, Trophy, ExternalLink, ChevronRight, Zap } from "lucide-react";
+import { ChevronRight, Zap, ExternalLink } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { getPlaceholderById } from "@/lib/placeholder-images";
 
 export default function Home() {
   const newsItems = [
@@ -12,13 +11,13 @@ export default function Home() {
       id: 1, 
       title: "Rust Console Edition: Power Plant Update", 
       excerpt: "The massive Power Plant monument finally arrives with new puzzles and high-tier loot.",
-      image: PlaceHolderImages.find(i => i.id === "news-1")?.imageUrl || ""
+      image: getPlaceholderById("news-1").imageUrl
     },
     { 
       id: 2, 
       title: "The Return of the Industrial Update", 
       excerpt: "Changes to automation and piping systems that every builder needs to know.",
-      image: PlaceHolderImages.find(i => i.id === "news-2")?.imageUrl || ""
+      image: getPlaceholderById("news-2").imageUrl
     }
   ];
 
@@ -37,7 +36,7 @@ export default function Home() {
         <div className="flex justify-between items-end mb-10">
           <div className="space-y-2">
             <h2 className="font-headline text-4xl font-black text-white tracking-tighter uppercase italic">
-              Live <span className="text-primary">Directoy</span>
+              Live <span className="text-primary">Directory</span>
             </h2>
             <p className="text-muted-foreground">The most populated servers right now.</p>
           </div>
@@ -51,7 +50,7 @@ export default function Home() {
             <Card key={i} className="glass-panel border-white/5 hover:border-primary/50 transition-all cursor-pointer group">
               <CardHeader className="relative overflow-hidden p-0 rounded-t-lg h-32">
                  <Image 
-                   src={PlaceHolderImages.find(img => img.id === "server-thumb")?.imageUrl || ""} 
+                   src={getPlaceholderById("server-thumb").imageUrl} 
                    alt="Server" 
                    fill 
                    className="object-cover opacity-50 group-hover:opacity-80 transition-opacity"
@@ -87,7 +86,9 @@ export default function Home() {
               {newsItems.map((news) => (
                 <div key={news.id} className="group cursor-pointer flex flex-col md:flex-row gap-6 items-start">
                   <div className="relative w-full md:w-64 h-44 rounded-xl overflow-hidden shrink-0 border border-white/5">
-                    <Image src={news.image} alt={news.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                    {news.image && (
+                      <Image src={news.image} alt={news.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                    )}
                   </div>
                   <div className="space-y-3">
                     <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">News / 2 hours ago</span>
@@ -111,7 +112,7 @@ export default function Home() {
                 <Card key={i} className="glass-panel border-white/5 p-4 flex gap-4 items-center hover:bg-white/5 transition-colors">
                   <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary/30">
                     <Image 
-                      src={PlaceHolderImages.find(img => img.id === `creator-${i}`)?.imageUrl || ""} 
+                      src={getPlaceholderById(`creator-${i}`).imageUrl} 
                       alt="Creator" 
                       fill 
                       className="object-cover"

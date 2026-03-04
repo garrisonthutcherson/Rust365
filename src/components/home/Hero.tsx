@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { getPlaceholderById } from "@/lib/placeholder-images";
 import { Sparkles, Play, ShieldAlert, Loader2 } from "lucide-react";
 import { adminAIGenerateBrandAssets } from "@/ai/flows/admin-ai-generate-brand-assets";
 import { useToast } from "@/hooks/use-toast";
@@ -16,13 +16,14 @@ export function Hero() {
   
   // Memoize the configuration reference
   const configRef = useMemoFirebase(() => doc(db, "appConfiguration", "global"), [db]);
-  const { data: config, isLoading: isConfigLoading } = useDoc(configRef);
+  const { data: config } = useDoc(configRef);
 
-  const heroOfficial = PlaceHolderImages.find(img => img.id === "hero-official");
-  const logoOfficial = PlaceHolderImages.find(img => img.id === "brand-logo");
+  const heroPlaceholder = getPlaceholderById("hero-official");
+  const logoPlaceholder = getPlaceholderById("brand-logo");
   
-  const [heroBg, setHeroBg] = useState(heroOfficial?.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media");
-  const [brandLogo, setBrandLogo] = useState(logoOfficial?.imageUrl || "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080");
+  // Initialize state with placeholder images as default
+  const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media");
+  const [brandLogo, setBrandLogo] = useState(logoPlaceholder.imageUrl || "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080");
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Sync state with Firestore data if it exists
@@ -82,13 +83,15 @@ export function Hero() {
 
         <div className="mb-8 flex justify-center">
           <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-primary/50 shadow-2xl shadow-primary/20 rotate-3 transform hover:rotate-0 transition-transform duration-500 bg-background">
-             <Image 
-               src={brandLogo} 
-               alt="Logo" 
-               fill 
-               className="object-cover" 
-               data-ai-hint="minimalist logo"
-             />
+             {brandLogo && (
+               <Image 
+                 src={brandLogo} 
+                 alt="Logo" 
+                 fill 
+                 className="object-cover" 
+                 data-ai-hint="minimalist logo"
+               />
+             )}
           </div>
         </div>
 
