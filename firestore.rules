@@ -1,0 +1,146 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * RUST365 SECURITY RULES - PROTOTYPING MODE
+     * 
+     * CORE PHILOSOPHY:
+     * This ruleset enforces a strict user-ownership model for community interactions (profiles, topics, posts) 
+     * while maintaining a public-read posture for curated directory content. It prioritizes 
+     * authorization security over data shape validation to allow for rapid iteration.
+     * 
+     * DATA STRUCTURE:
+     * - /userProfiles/{userId}: Private profile management, public reading.
+     * - /topics/{topicId} & /topics/{topicId}/posts/{postId}: Public forum structure.
+     * - /rustServers, /newsArticles, /contentCreators, /appConfiguration: Curated public content.
+     * 
+     * KEY SECURITY DECISIONS:
+     * 1. Authorization Independence: Ownership fields (authorId) are denormalized onto topics 
+     *    and posts to avoid costly parent-document lookups during write operations.
+     * 2. Administrative Lockdown: Collections intended for curated content (servers, news, config) 
+     *    are set to read-only for end-users, assuming administrative updates via backend or admin tools.
+     * 3. Prototyping Flexibility: Rules do not enforce strict schema types (e.g., strings vs. numbers) 
+     *    but strictly enforce relational integrity (e.g., ensuring a post's authorId matches the sender).
+     */
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** @description Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the authenticated user's UID matches the provided ID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Checks if the user is the owner and the document currently exists. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** @description Checks if the authenticated user matches the authorId field in the document. */
+    function isAuthor(authorId) {
+      return isSignedIn() && request.auth.uid == authorId;
+    }
+
+    /** @description Checks if the user is the author and the document currently exists. */
+    function isExistingAuthor(authorId) {
+      return resource != null && isAuthor(authorId);
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for user profiles. Users can only manage their own profile.
+     * @path /userProfiles/{userId}
+     * @allow (create) if auth.uid == userId and data.id == userId
+     * @deny (update) if auth.uid != userId
+     * @principle Ownership & Self-Creation
+     */
+    match /userProfiles/{userId} {
+      allow get, list: if true;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Public directory of Rust servers. Read-only for standard users.
+     * @path /rustServers/{serverId}
+     * @allow (get) if true
+     * @deny (create, update, delete) if true (Restricted to Admins/Backend)
+     * @principle Restricted Administrative Writes
+     */
+    match /rustServers/{serverId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; 
+    }
+
+    /**
+     * @description Forum topics. Publicly readable. Creation requires auth; edits require authorship.
+     * @path /topics/{topicId}
+     * @allow (create) if signedIn() and data.authorId == auth.uid
+     * @deny (update) if auth.uid != existingData.authorId
+     * @principle Ownership & Relational Integrity
+     */
+    match /topics/{topicId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if isExistingAuthor(resource.data.authorId) && request.resource.data.authorId == resource.data.authorId;
+      allow delete: if isExistingAuthor(resource.data.authorId);
+
+      /**
+       * @description Individual posts within a topic. Ownership denormalized via authorId.
+       * @path /topics/{topicId}/posts/{postId}
+       * @allow (create) if signedIn() and data.authorId == auth.uid
+       * @deny (delete) if auth.uid != existingData.authorId
+       * @principle Authorization Independence (avoiding Topic lookups)
+       */
+      match /posts/{postId} {
+        allow get, list: if true;
+        allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+        allow update: if isExistingAuthor(resource.data.authorId) && request.resource.data.authorId == resource.data.authorId;
+        allow delete: if isExistingAuthor(resource.data.authorId);
+      }
+    }
+
+    /**
+     * @description Curated news articles for the community.
+     * @path /newsArticles/{articleId}
+     * @allow (get, list) if true
+     * @deny (write) if true (Restricted to Admins/Backend)
+     * @principle Public Read with Restricted Writes
+     */
+    match /newsArticles/{articleId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Showcase of prominent Rust content creators.
+     * @path /contentCreators/{creatorId}
+     * @allow (get, list) if true
+     * @deny (write) if true (Restricted to Admins/Backend)
+     * @principle Public Read with Restricted Writes
+     */
+    match /contentCreators/{creatorId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Global application configuration and asset URLs.
+     * @path /appConfiguration/{configId}
+     * @allow (get) if true
+     * @deny (write) if true (Restricted to Admins/Backend)
+     * @principle Public Read with Restricted Writes
+     */
+    match /appConfiguration/{configId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+  }
+}
