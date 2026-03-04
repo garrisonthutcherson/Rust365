@@ -24,12 +24,12 @@ service cloud.firestore {
 
     match /categories/{categoryId} {
       allow get, list: if true;
-      allow write: if false; // Admin only
+      allow write: if isSignedIn(); // Temporarily allow authenticated users to seed structure
     }
 
     match /subCategories/{subCategoryId} {
       allow get, list: if true;
-      allow write: if false; // Admin only
+      allow write: if isSignedIn(); // Temporarily allow authenticated users to seed structure
     }
 
     match /topics/{topicId} {
