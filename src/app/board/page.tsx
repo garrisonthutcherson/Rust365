@@ -1,16 +1,26 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, ThumbsUp, Eye, Search, PlusCircle, TrendingUp } from "lucide-react";
+import { MessageSquare, Search, PlusCircle, TrendingUp, Loader2 } from "lucide-react";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection, query, orderBy, limit } from "firebase/firestore";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 export default function BoardPage() {
-  const topics = [
-    { id: 1, title: "Official Wipe Day Discussion - May 2025", author: "RaiderX", replies: 124, views: "5.2k", category: "Wipe Day", hot: true },
-    { id: 2, title: "Solo Base Design: The Bunker (V3)", author: "Architect", replies: 45, views: "1.8k", category: "Guides", hot: false },
-    { id: 3, title: "Bloody Mouse Scripting: Why is it still a thing?", author: "Purist", replies: 89, views: "3.1k", category: "Discussion", hot: true },
-    { id: 4, title: "LFG: Trio looking for dedicated farmer", author: "FarmerJoe", replies: 12, views: "400", category: "Recruitment", hot: false },
-    { id: 5, title: "New Industrial Update - Bug Reports", author: "FacepunchStan", replies: 230, views: "12k", category: "Bugs", hot: true },
-  ];
+  const db = useFirestore();
+  
+  const topicsQuery = useMemoFirebase(() => {
+    return query(
+      collection(db, "topics"),
+      orderBy("lastReplyAt", "desc"),
+      limit(20)
+    );
+  }, [db]);
+
+  const { data: topics, isLoading } = useCollection(topicsQuery);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -23,9 +33,11 @@ export default function BoardPage() {
               </h1>
               <p className="text-muted-foreground">The tactical heart of the Rust community.</p>
             </div>
-            <Button className="rust-gradient font-headline px-8">
-              <PlusCircle className="mr-2 w-5 h-5" />
-              NEW TOPIC
+            <Button asChild className="rust-gradient font-headline px-8">
+              <Link href="/board/new">
+                <PlusCircle className="mr-2 w-5 h-5" />
+                NEW TOPIC
+              </Link>
             </Button>
           </div>
 
@@ -39,43 +51,55 @@ export default function BoardPage() {
           </div>
 
           <div className="space-y-4">
-            {topics.map((topic) => (
-              <div key={topic.id} className="glass-panel p-6 rounded-2xl border border-white/5 hover:border-primary/30 transition-all group cursor-pointer">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-white/10 text-muted-foreground">
-                        {topic.category}
-                      </Badge>
-                      {topic.hot && (
-                        <div className="flex items-center gap-1 text-[10px] font-black uppercase text-primary">
-                          <TrendingUp className="w-3 h-3" />
-                          Trending
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="font-headline text-2xl font-bold text-white group-hover:text-primary transition-colors leading-tight">
-                      {topic.title}
-                    </h3>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      <span>Posted by <span className="text-white">@{topic.author}</span></span>
-                      <span>•</span>
-                      <span>2 hours ago</span>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex gap-8 text-center shrink-0">
-                    <div className="space-y-1">
-                      <p className="text-white font-headline font-black text-xl">{topic.replies}</p>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Replies</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-white font-headline font-black text-xl">{topic.views}</p>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Views</p>
-                    </div>
-                  </div>
-                </div>
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
-            ))}
+            ) : topics?.length === 0 ? (
+              <div className="text-center py-20 glass-panel rounded-2xl border border-white/5">
+                <p className="text-muted-foreground">No topics yet. Start the conversation!</p>
+              </div>
+            ) : (
+              topics?.map((topic) => (
+                <Link key={topic.id} href={`/board/${topic.id}`}>
+                  <div className="glass-panel p-6 rounded-2xl border border-white/5 hover:border-primary/30 transition-all group cursor-pointer mb-4">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-white/10 text-muted-foreground">
+                            Discussion
+                          </Badge>
+                          {topic.viewCount > 100 && (
+                            <div className="flex items-center gap-1 text-[10px] font-black uppercase text-primary">
+                              <TrendingUp className="w-3 h-3" />
+                              Trending
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="font-headline text-2xl font-bold text-white group-hover:text-primary transition-colors leading-tight">
+                          {topic.title}
+                        </h3>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                          <span>By <span className="text-white">Survivor</span></span>
+                          <span>•</span>
+                          <span>{topic.createdAt ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true }) : "just now"}</span>
+                        </div>
+                      </div>
+                      <div className="hidden md:flex gap-8 text-center shrink-0">
+                        <div className="space-y-1">
+                          <p className="text-white font-headline font-black text-xl">{topic.replyCount || 0}</p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Replies</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-white font-headline font-black text-xl">{topic.viewCount || 0}</p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Views</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
           <Button variant="outline" className="w-full border-white/10 font-bold uppercase tracking-widest py-8">Load More Discussions</Button>
         </div>
