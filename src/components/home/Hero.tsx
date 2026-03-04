@@ -1,22 +1,40 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Sparkles, Play, ShieldAlert } from "lucide-react";
+import { Sparkles, Play, ShieldAlert, Loader2 } from "lucide-react";
 import { adminAIGenerateBrandAssets } from "@/ai/flows/admin-ai-generate-brand-assets";
 import { useToast } from "@/hooks/use-toast";
+import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 export function Hero() {
   const { toast } = useToast();
+  const db = useFirestore();
   
-  const fallbackItem = PlaceHolderImages.find(img => img.id === "hero-fallback");
+  // Memoize the configuration reference
+  const configRef = useMemoFirebase(() => doc(db, "appConfiguration", "global"), [db]);
+  const { data: config, isLoading: isConfigLoading } = useDoc(configRef);
+
+  const fallbackHero = PlaceHolderImages.find(img => img.id === "hero-official")?.imageUrl || "https://picsum.photos/seed/rustofficial/1920/1080";
   const logoFallbackItem = PlaceHolderImages.find(img => img.id === "brand-logo");
   
-  const [heroBg, setHeroBg] = useState(fallbackItem?.imageUrl || "https://picsum.photos/seed/rust1/1920/1080");
+  const [heroBg, setHeroBg] = useState(fallbackHero);
   const [brandLogo, setBrandLogo] = useState(logoFallbackItem?.imageUrl || "https://picsum.photos/seed/rustlogo/200/200");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Sync state with Firestore data if it exists
+  useEffect(() => {
+    if (config?.heroImageUrl) {
+      setHeroBg(config.heroImageUrl);
+    }
+    if (config?.brandLogoUrl) {
+      setBrandLogo(config.brandLogoUrl);
+    }
+  }, [config]);
 
   const generateAssets = async () => {
     setIsGenerating(true);
@@ -51,7 +69,7 @@ export function Hero() {
           fill 
           className="object-cover transition-opacity duration-1000"
           priority
-          data-ai-hint="post-apocalyptic survival"
+          data-ai-hint="post-apocalyptic dome"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-transparent" />
@@ -95,7 +113,11 @@ export function Hero() {
             onClick={generateAssets}
             disabled={isGenerating}
           >
-            <Sparkles className={`mr-2 w-5 h-5 text-primary ${isGenerating ? 'animate-spin' : ''}`} />
+            {isGenerating ? (
+              <Loader2 className="mr-2 w-5 h-5 animate-spin text-primary" />
+            ) : (
+              <Sparkles className="mr-2 w-5 h-5 text-primary" />
+            )}
             {isGenerating ? "GENERATING..." : "REGENERATE AI STYLE"}
           </Button>
         </div>

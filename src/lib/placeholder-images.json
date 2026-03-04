@@ -1,6 +1,12 @@
 {
   "placeholderImages": [
     {
+      "id": "hero-official",
+      "description": "Cinematic shot of a rust survivor looking at a nuclear plant dome during a post-apocalyptic sunset",
+      "imageUrl": "https://picsum.photos/seed/rustofficial/1920/1080",
+      "imageHint": "post-apocalyptic dome"
+    },
+    {
       "id": "hero-fallback",
       "description": "Epic cinematic shot of a rust base in a post-apocalyptic sunset",
       "imageUrl": "https://picsum.photos/seed/rust1/1920/1080",
