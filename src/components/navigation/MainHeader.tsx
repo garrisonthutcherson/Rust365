@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Shield, LayoutGrid, MessageSquare, Newspaper, User, Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription 
+} from "@/components/ui/sheet";
 import { useState } from "react";
 
 export function MainHeader() {
@@ -56,6 +63,12 @@ export function MainHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="bg-background border-l border-border pt-12">
+              <SheetHeader>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Access site pages and community features.
+                </SheetDescription>
+              </SheetHeader>
               <div className="flex flex-col gap-6">
                 {navLinks.map((link) => (
                   <Link 
