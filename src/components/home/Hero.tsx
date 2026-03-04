@@ -18,11 +18,11 @@ export function Hero() {
   const configRef = useMemoFirebase(() => doc(db, "appConfiguration", "global"), [db]);
   const { data: config, isLoading: isConfigLoading } = useDoc(configRef);
 
-  const heroFallbackItem = PlaceHolderImages.find(img => img.id === "hero-official");
-  const logoFallbackItem = PlaceHolderImages.find(img => img.id === "brand-logo");
+  const heroOfficial = PlaceHolderImages.find(img => img.id === "hero-official");
+  const logoOfficial = PlaceHolderImages.find(img => img.id === "brand-logo");
   
-  const [heroBg, setHeroBg] = useState(heroFallbackItem?.imageUrl || "https://picsum.photos/seed/rust-hero-v2/1920/1080");
-  const [brandLogo, setBrandLogo] = useState(logoFallbackItem?.imageUrl || "https://picsum.photos/seed/rustlogo/200/200");
+  const [heroBg, setHeroBg] = useState(heroOfficial?.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media");
+  const [brandLogo, setBrandLogo] = useState(logoOfficial?.imageUrl || "https://images.unsplash.com/photo-1607203391481-ff5db95e392f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWluaW1hbGlzdCUyMGxvZ298ZW58MHx8fHwxNzcyNTMyMDA4fDA&ixlib=rb-4.1.0&q=80&w=1080");
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Sync state with Firestore data if it exists
