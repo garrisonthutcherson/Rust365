@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth, useUser } from "@/firebase";
+import { useAuth, useUser, useFirestore } from "@/firebase";
 import { initiateEmailSignUp, resendVerificationEmail } from "@/firebase/non-blocking-login";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { doc } from "firebase/firestore";
 import { Shield, Loader2, Mail, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
@@ -17,7 +19,22 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const db = useFirestore();
   const router = useRouter();
+
+  // Create profile effect: When user is created, ensure profile doc exists
+  useEffect(() => {
+    if (user && username) {
+      const profileRef = doc(db, "userProfiles", user.uid);
+      setDocumentNonBlocking(profileRef, {
+        id: user.uid,
+        username: username,
+        email: user.email,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+    }
+  }, [user, username, db]);
 
   useEffect(() => {
     // Redirect to home if user is signed in AND email is verified
