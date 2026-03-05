@@ -1,11 +1,11 @@
-
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFirestore, useUser } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, collection } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Shield, Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
@@ -29,27 +29,25 @@ export default function SeedPage() {
     { id: "bugs", categoryId: "support", name: "Bug Reports", order: 1, description: "Encountered a glitch? Report it here.", topicCount: 0, postCount: 0 },
   ];
 
-  const handleSeed = async () => {
+  const handleSeed = () => {
     if (!user) return;
     setIsSeeding(true);
 
-    try {
-      // Seed Categories
-      for (const cat of categories) {
-        await setDoc(doc(db, "categories", cat.id), cat);
-      }
-
-      // Seed Sub-Categories
-      for (const sub of subCategories) {
-        await setDoc(doc(db, "subCategories", sub.id), sub);
-      }
-
-      setIsComplete(true);
-    } catch (error) {
-      console.error("Error seeding board:", error);
-    } finally {
-      setIsSeeding(false);
+    // Seed Categories
+    for (const cat of categories) {
+      setDocumentNonBlocking(doc(db, "categories", cat.id), cat, { merge: true });
     }
+
+    // Seed Sub-Categories
+    for (const sub of subCategories) {
+      setDocumentNonBlocking(doc(db, "subCategories", sub.id), sub, { merge: true });
+    }
+
+    // Since these are non-blocking, we show completion after initiating
+    setTimeout(() => {
+      setIsComplete(true);
+      setIsSeeding(false);
+    }, 1500);
   };
 
   if (isUserLoading) {
@@ -102,8 +100,8 @@ export default function SeedPage() {
           ) : (
             <div className="flex flex-col items-center gap-4 py-6 text-center">
               <CheckCircle2 className="w-16 h-16 text-green-500" />
-              <h3 className="font-headline text-2xl font-bold text-white">Board Deployed Successfully!</h3>
-              <p className="text-muted-foreground">The categories and sub-categories are now live.</p>
+              <h3 className="font-headline text-2xl font-bold text-white">Board Deployment Initiated!</h3>
+              <p className="text-muted-foreground">Intel is being uploaded to the server.</p>
             </div>
           )}
         </CardContent>

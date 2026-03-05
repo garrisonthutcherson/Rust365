@@ -1,14 +1,13 @@
-
 "use client";
 
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, query, where, orderBy, doc } from "firebase/firestore";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { MessageSquare, ArrowLeft, Loader2, User, Clock, Eye } from "lucide-react";
+import { ArrowLeft, Loader2, User, Clock, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
+import { RelativeTime } from "@/components/ui/RelativeTime";
 
 export default function SubCategoryPage() {
   const { subCategoryId } = useParams();
@@ -75,7 +74,7 @@ export default function SubCategoryPage() {
                   </h3>
                   <div className="flex flex-wrap items-center gap-4 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                     <span className="flex items-center gap-1.5"><User className="w-3 h-3 text-primary" /> {topic.authorName || "Survivor"}</span>
-                    <span className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary" /> {formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })}</span>
+                    <span className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary" /> <RelativeTime date={topic.createdAt} /></span>
                     <span className="flex items-center gap-1.5"><Eye className="w-3 h-3 text-primary" /> {topic.viewCount || 0} Views</span>
                   </div>
                 </div>
@@ -87,9 +86,9 @@ export default function SubCategoryPage() {
                   </div>
                   <div className="hidden sm:block text-right border-l border-white/10 pl-8 min-w-[140px]">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Last Reply</p>
-                    <p className="text-white text-[10px] font-black uppercase italic">
-                      {formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })}
-                    </p>
+                    <div className="text-white text-[10px] font-black uppercase italic">
+                      <RelativeTime date={topic.lastReplyAt} />
+                    </div>
                   </div>
                 </div>
               </div>

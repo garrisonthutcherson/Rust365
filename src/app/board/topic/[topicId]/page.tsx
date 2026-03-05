@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useState } from "react";
 import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, doc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 import { useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, ArrowLeft, Send, User, Calendar, MessageCircle, Shield } from "lucide-react";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
+import { RelativeTime } from "@/components/ui/RelativeTime";
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function TopicDetailPage() {
@@ -52,11 +51,13 @@ export default function TopicDetailPage() {
     setDocumentNonBlocking(newPostRef, postData, { merge: true });
     
     // Update topic stats
-    updateDocumentNonBlocking(topicRef!, {
-      replyCount: (topic.replyCount || 0) + 1,
-      lastReplyAt: now,
-      updatedAt: now,
-    });
+    if (topicRef) {
+      updateDocumentNonBlocking(topicRef, {
+        replyCount: (topic.replyCount || 0) + 1,
+        lastReplyAt: now,
+        updatedAt: now,
+      });
+    }
 
     setReplyContent("");
   };
@@ -99,13 +100,13 @@ export default function TopicDetailPage() {
           </h1>
           <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-black uppercase tracking-widest">
             <span className="flex items-center gap-2 text-white"><User className="w-4 h-4 text-primary" /> {topic.authorName || "Survivor"}</span>
-            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> {formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })}</span>
+            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> <RelativeTime date={topic.createdAt} /></span>
             <span className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" /> {topic.replyCount || 0} Replies</span>
           </div>
         </div>
 
         <Card className="glass-panel border-white/10 bg-card/40">
-          <CardContent className="p-8 md:p-12 prose prose-invert max-w-none">
+          <CardContent className="p-8 md:p-12">
             <p className="text-xl text-white/90 leading-relaxed whitespace-pre-wrap">{topic.content}</p>
           </CardContent>
         </Card>
@@ -133,7 +134,9 @@ export default function TopicDetailPage() {
                     <span className="text-sm font-black text-primary uppercase italic">{post.authorName || "Survivor"}</span>
                     <Badge variant="outline" className="text-[8px] border-white/10 text-muted-foreground uppercase">#{idx + 1}</Badge>
                   </div>
-                  <span className="text-[10px] text-muted-foreground font-bold uppercase">{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+                  <div className="text-[10px] text-muted-foreground font-bold uppercase">
+                    <RelativeTime date={post.createdAt} />
+                  </div>
                 </div>
                 <p className="text-white/80 leading-relaxed whitespace-pre-wrap">{post.content}</p>
               </CardContent>
