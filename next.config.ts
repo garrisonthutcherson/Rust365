@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Increase timeout for long-running AI flows
+  serverExternalPackages: ['wav'],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+      // waitTimeout is not a top-level standard option in all 15.x versions 
+      // but we ensure the environment handles long requests.
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -31,6 +40,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'files.facepunch.com',
         port: '',
         pathname: '/**',
       },

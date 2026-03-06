@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchRustNews, type NewsItem } from "@/ai/flows/fetch-rust-news-flow";
+import { fetchRustNews, type FetchRustNewsOutput } from "@/ai/flows/fetch-rust-news-flow";
 
 export default function NewsPage() {
   const [news, setNews] = useState<any[]>([]);
@@ -61,8 +61,8 @@ export default function NewsPage() {
               </h2>
               <p className="text-lg text-white/80 line-clamp-2">{featuredArticle.excerpt}</p>
               <div className="flex gap-4">
-                 <Button size="lg" className="rust-gradient font-headline" asChild>
-                   <span>READ FULL INTEL</span>
+                 <Button size="lg" className="rust-gradient font-headline">
+                   READ FULL INTEL
                  </Button>
               </div>
             </div>
