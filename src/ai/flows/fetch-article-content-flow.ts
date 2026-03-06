@@ -44,7 +44,8 @@ const fetchArticleContentFlow = ai.defineFlow(
       if (!response.ok) {
         throw new Error(`Failed to fetch article at ${input.url}`);
       }
-      const html = await response.text();
+      // Truncate HTML significantly to speed up Gemini extraction and prevent timeouts
+      const html = (await response.text()).substring(0, 25000);
 
       const { output } = await ai.generate({
         prompt: `Extract the full article content from this Rust Devblog HTML. 
@@ -55,11 +56,11 @@ const fetchArticleContentFlow = ai.defineFlow(
         - The primary title
         - The publication date
         - The category
-        - The main hero image URL (look for the largest image or og:image)
+        - The main hero image URL
         - The author name if present
         
         HTML Content:
-        ${html.substring(0, 50000)} // Truncate to avoid token limits while keeping core content`,
+        ${html}`,
         output: { schema: FetchArticleContentOutputSchema },
       });
 

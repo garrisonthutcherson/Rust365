@@ -11,7 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const NewsItemSchema = z.object({
-  id: z.string().describe('A URL-safe slug for the article.'),
+  id: z.string().describe('A URL-safe slug for the article. Use ONLY the last part of the URL (e.g. "community-update-268"). NO slashes.'),
   title: z.string(),
   date: z.string(),
   category: z.string(),
@@ -50,17 +50,23 @@ const fetchRustNewsFlow = ai.defineFlow(
       if (!response.ok) {
         throw new Error('Failed to fetch Rust RSS feed');
       }
-      const xmlData = await response.text();
+      // Truncate XML to avoid massive token usage and potential timeouts
+      const xmlData = (await response.text()).substring(0, 35000);
 
       // 2. Use Gemini to parse the XML into our structured schema
       const { output } = await ai.generate({
         prompt: `Extract the latest ${input.limit} news articles from this Rust Devblog RSS XML data. 
+        
+        CRITICAL ID INSTRUCTION: For the "id" field, use ONLY the final slug part of the article URL. 
+        Example: If the link is "https://rust.facepunch.com/news/community-update-268", the id MUST be "community-update-268".
+        DO NOT include the full URL.
+        
         For each article, provide:
-        - A unique id (MUST be the slug from the end of the URL, e.g. "community-update-268")
+        - id
         - The title
         - The publication date (formatted nicely like "May 12, 2025")
         - A category (e.g., Update, Community, Devblog)
-        - A short excerpt/summary of the post
+        - A short excerpt/summary
         - The main image URL
         - The full link to the article
 

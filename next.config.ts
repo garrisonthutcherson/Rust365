@@ -13,8 +13,6 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
-      // waitTimeout is not a top-level standard option in all 15.x versions 
-      // but we ensure the environment handles long requests.
     },
   },
   images: {
