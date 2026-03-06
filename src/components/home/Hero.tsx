@@ -14,19 +14,16 @@ export function Hero() {
   const { toast } = useToast();
   const db = useFirestore();
   
-  // Memoize the configuration reference
   const configRef = useMemoFirebase(() => doc(db, "appConfiguration", "global"), [db]);
   const { data: config } = useDoc(configRef);
 
   const heroPlaceholder = getPlaceholderById("hero-official");
   const logoPlaceholder = getPlaceholderById("brand-logo");
   
-  // Initialize state with specific brand assets
-  const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl || "https://firebasestorage.googleapis.com/v0/b/studio-8156739726-d4da5.firebasestorage.app/o/rust365_hero_background.png?alt=media&token=7da7b671-e55c-43e0-8616-daff25625f4a");
+  const [heroBg, setHeroBg] = useState(heroPlaceholder.imageUrl);
   const [brandLogo, setBrandLogo] = useState(logoPlaceholder.imageUrl);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Sync state with Firestore data if it exists
   useEffect(() => {
     if (config?.heroImageUrl) {
       setHeroBg(config.heroImageUrl);

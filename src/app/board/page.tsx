@@ -1,12 +1,11 @@
-
 "use client";
 
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import Link from "next/link";
-import { MessageSquare, Layers, Loader2, ChevronRight, TrendingUp } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { MessageSquare, Layers, ChevronRight, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BoardIndexPage() {
   const db = useFirestore();
@@ -22,13 +21,7 @@ export default function BoardIndexPage() {
   const { data: categories, isLoading: catsLoading } = useCollection(categoriesQuery);
   const { data: subCategories, isLoading: subsLoading } = useCollection(subCategoriesQuery);
 
-  if (catsLoading || subsLoading) {
-    return (
-      <div className="flex justify-center py-40">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const isLoading = catsLoading || subsLoading;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
@@ -48,7 +41,20 @@ export default function BoardIndexPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
         <div className="lg:col-span-3 space-y-10">
-          {categories?.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-12">
+              {[1, 2].map((i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="h-8 w-48 bg-white/5" />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((j) => (
+                      <Skeleton key={j} className="h-24 w-full rounded-xl bg-white/5" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : categories?.length === 0 ? (
             <div className="text-center py-20 glass-panel rounded-2xl border border-white/5">
               <p className="text-muted-foreground">The island is quiet... check back later.</p>
             </div>

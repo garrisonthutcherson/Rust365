@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, ArrowLeft, Send, User, Calendar, MessageCircle, Shield } from "lucide-react";
+import { ArrowLeft, Send, User, Calendar, MessageCircle, Shield } from "lucide-react";
 import Link from "next/link";
 import { RelativeTime } from "@/components/ui/RelativeTime";
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TopicDetailPage() {
   const { topicId } = useParams();
@@ -50,7 +51,6 @@ export default function TopicDetailPage() {
 
     setDocumentNonBlocking(newPostRef, postData, { merge: true });
     
-    // Update topic stats
     if (topicRef) {
       updateDocumentNonBlocking(topicRef, {
         replyCount: (topic.replyCount || 0) + 1,
@@ -62,15 +62,20 @@ export default function TopicDetailPage() {
     setReplyContent("");
   };
 
-  if (topicLoading || postsLoading) {
+  if (topicLoading && !topic) {
     return (
-      <div className="flex justify-center py-40">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      <div className="max-w-5xl mx-auto px-6 py-12 space-y-10">
+        <Skeleton className="h-8 w-32 bg-white/5" />
+        <div className="space-y-6">
+          <Skeleton className="h-6 w-24 bg-white/5" />
+          <Skeleton className="h-20 w-3/4 bg-white/5" />
+          <Skeleton className="h-64 w-full rounded-2xl bg-white/5" />
+        </div>
       </div>
     );
   }
 
-  if (!topic) {
+  if (!topic && !topicLoading) {
     return (
       <div className="max-w-xl mx-auto py-40 text-center space-y-6">
         <h1 className="text-4xl font-headline font-black uppercase italic">Topic <span className="text-primary">Not Found</span></h1>
@@ -85,7 +90,7 @@ export default function TopicDetailPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 space-y-10">
       <Button variant="ghost" asChild className="text-muted-foreground hover:text-white -ml-4">
-        <Link href={`/board/sub/${topic.subCategoryId}`}>
+        <Link href={`/board/sub/${topic?.subCategoryId}`}>
           <ArrowLeft className="mr-2 w-4 h-4" />
           Back to Discussions
         </Link>
@@ -96,18 +101,18 @@ export default function TopicDetailPage() {
         <div className="space-y-4">
           <Badge className="bg-primary/20 text-primary border-primary/30 uppercase italic font-black">Topic Discussion</Badge>
           <h1 className="font-headline text-4xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-tight">
-            {topic.title}
+            {topic?.title}
           </h1>
           <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-black uppercase tracking-widest">
-            <span className="flex items-center gap-2 text-white"><User className="w-4 h-4 text-primary" /> {topic.authorName || "Survivor"}</span>
-            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> <RelativeTime date={topic.createdAt} /></span>
-            <span className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" /> {topic.replyCount || 0} Replies</span>
+            <span className="flex items-center gap-2 text-white"><User className="w-4 h-4 text-primary" /> {topic?.authorName || "Survivor"}</span>
+            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> {topic?.createdAt && <RelativeTime date={topic.createdAt} />}</span>
+            <span className="flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" /> {topic?.replyCount || 0} Replies</span>
           </div>
         </div>
 
         <Card className="glass-panel border-white/10 bg-card/40">
           <CardContent className="p-8 md:p-12">
-            <p className="text-xl text-white/90 leading-relaxed whitespace-pre-wrap">{topic.content}</p>
+            <p className="text-xl text-white/90 leading-relaxed whitespace-pre-wrap">{topic?.content}</p>
           </CardContent>
         </Card>
       </div>
@@ -118,31 +123,39 @@ export default function TopicDetailPage() {
           Tactical <span className="text-primary">Replies</span>
         </h3>
         
-        {posts?.map((post, idx) => (
-          <div key={post.id} className="flex gap-4">
-            <div className="hidden md:flex flex-col items-center gap-2 shrink-0">
-              <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                <User className="w-6 h-6 text-muted-foreground" />
-              </div>
-              <div className="h-full w-px bg-gradient-to-b from-white/10 to-transparent" />
-            </div>
-            
-            <Card className="flex-1 glass-panel border-white/5 bg-card/20">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-black text-primary uppercase italic">{post.authorName || "Survivor"}</span>
-                    <Badge variant="outline" className="text-[8px] border-white/10 text-muted-foreground uppercase">#{idx + 1}</Badge>
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-bold uppercase">
-                    <RelativeTime date={post.createdAt} />
-                  </div>
-                </div>
-                <p className="text-white/80 leading-relaxed whitespace-pre-wrap">{post.content}</p>
-              </CardContent>
-            </Card>
+        {postsLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-xl bg-white/5" />
+            ))}
           </div>
-        ))}
+        ) : (
+          posts?.map((post, idx) => (
+            <div key={post.id} className="flex gap-4">
+              <div className="hidden md:flex flex-col items-center gap-2 shrink-0">
+                <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                  <User className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <div className="h-full w-px bg-gradient-to-b from-white/10 to-transparent" />
+              </div>
+              
+              <Card className="flex-1 glass-panel border-white/5 bg-card/20">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-black text-primary uppercase italic">{post.authorName || "Survivor"}</span>
+                      <Badge variant="outline" className="text-[8px] border-white/10 text-muted-foreground uppercase">#{idx + 1}</Badge>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-bold uppercase">
+                      <RelativeTime date={post.createdAt} />
+                    </div>
+                  </div>
+                  <p className="text-white/80 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+                </CardContent>
+              </Card>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Reply Form */}

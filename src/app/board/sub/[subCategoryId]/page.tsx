@@ -4,10 +4,11 @@ import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase
 import { collection, query, where, orderBy, doc } from "firebase/firestore";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Loader2, User, Clock, Eye } from "lucide-react";
+import { ArrowLeft, User, Clock, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RelativeTime } from "@/components/ui/RelativeTime";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SubCategoryPage() {
   const { subCategoryId } = useParams();
@@ -27,13 +28,7 @@ export default function SubCategoryPage() {
 
   const { data: topics, isLoading: topicsLoading } = useCollection(topicsQuery);
 
-  if (subLoading || topicsLoading) {
-    return (
-      <div className="flex justify-center py-40">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const isLoading = subLoading || topicsLoading;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-8">
@@ -47,10 +42,18 @@ export default function SubCategoryPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-8">
         <div className="space-y-2">
           <Badge className="bg-primary/20 text-primary border-primary/30 uppercase italic font-black">Sub-Category</Badge>
-          <h1 className="font-headline text-5xl font-black text-white tracking-tighter uppercase italic">
-            {subCategory?.name || "Topics"}
-          </h1>
-          <p className="text-muted-foreground">{subCategory?.description}</p>
+          {isLoading ? (
+            <Skeleton className="h-12 w-64 bg-white/5" />
+          ) : (
+            <h1 className="font-headline text-5xl font-black text-white tracking-tighter uppercase italic">
+              {subCategory?.name || "Topics"}
+            </h1>
+          )}
+          {isLoading ? (
+            <Skeleton className="h-4 w-96 bg-white/5" />
+          ) : (
+            <p className="text-muted-foreground">{subCategory?.description}</p>
+          )}
         </div>
         <Button asChild className="rust-gradient font-headline px-8 h-12">
           <Link href={`/board/new?subId=${subCategoryId}`}>
@@ -60,7 +63,13 @@ export default function SubCategoryPage() {
       </div>
 
       <div className="space-y-4">
-        {topics?.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-28 w-full rounded-xl bg-white/5" />
+            ))}
+          </div>
+        ) : topics?.length === 0 ? (
           <div className="text-center py-20 glass-panel rounded-2xl border border-white/5">
             <p className="text-muted-foreground">No discussions here yet. Start the raid!</p>
           </div>
