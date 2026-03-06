@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { getPlaceholderById } from "@/lib/placeholder-images";
-import { Sparkles, Play, ShieldAlert, Loader2 } from "lucide-react";
+import { Sparkles, Play, Loader2 } from "lucide-react";
 import { adminAIGenerateBrandAssets } from "@/ai/flows/admin-ai-generate-brand-assets";
 import { useToast } from "@/hooks/use-toast";
 import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { WipeCountdown } from "./WipeCountdown";
 
 export function Hero() {
   const { toast } = useToast();
@@ -67,16 +68,14 @@ export function Hero() {
           className="object-cover transition-opacity duration-1000"
           priority
           data-ai-hint="rust survival wasteland"
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-transparent" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-xs font-bold tracking-widest uppercase mb-8 animate-pulse">
-          <ShieldAlert className="w-4 h-4" />
-          Server Wiping in 12h 45m
-        </div>
+        <WipeCountdown />
 
         <div className="mb-8 flex justify-center">
           <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-primary/50 shadow-2xl shadow-primary/20 rotate-3 transform hover:rotate-0 transition-transform duration-500 bg-background">
@@ -87,6 +86,7 @@ export function Hero() {
                  fill 
                  className="object-contain p-2" 
                  data-ai-hint="rust logo"
+                 unoptimized
                />
              )}
           </div>
